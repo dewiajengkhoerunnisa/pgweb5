@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaflet JS</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <style>
+        html,
+        body,
+        #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+
+        // Inisialisasi peta
+        var map = L.map("map").setView([-8.3134426, 123.1649780], 11);
+
+
+        // Tile Layer Base Map
+        var basemap = L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }
+        );
+
+        // Menambahkan basemap ke dalam peta
+        basemap.addTo(map);
+
+
+        // GeoJSON Point Toponimi
+        var toponimi = L.geoJSON(null, {
+
+            pointToLayer: function (feature, latlng) {
+
+                return L.marker(latlng, {
+                    icon: L.icon({
+                        iconUrl: "images/home_marker.png",
+                        iconSize: [48, 48],
+                        iconAnchor: [24, 48],
+                        popupAnchor: [0, -48],
+                        tooltipAnchor: [-16, -30]
+                    })
+                });
+
+            },
+
+            onEachFeature: function (feature, layer) {
+
+                var popup_content =
+                    "<img src='images/" +
+                    feature.properties.image +
+                    "' alt='' width='200'>" +
+                    "<br>" +
+                    "Nama: " +
+                    feature.properties.TOPONIMI +
+                    "<br>" +
+                    "Koordinat: " +
+                    feature.geometry.coordinates[1] +
+                    ", " +
+                    feature.geometry.coordinates[0];
+
+                layer.on({
+
+                    click: function () {
+                        layer.bindPopup(popup_content).openPopup();
+                    },
+
+                    mouseover: function () {
+                        layer.bindTooltip(
+                            feature.properties.TOPONIMI,
+                            {
+                                direction: "left",
+                                sticky: true
+                            }
+                        ).openTooltip();
+                    }
+
+                });
+
+            }
+
+        });
+
+        $.getJSON(
+            "geojson/toponimi.geojson",
+            function (data) {
+
+                toponimi.addData(data);
+                map.addLayer(toponimi);
+
+            }
+        );
+
+
+        // GeoJSON Polyline Jalan
+        var jalan = L.geoJSON(null, {
+
+            style: function () {
+
+                return {
+                    color: "red",
+                    opacity: 1,
+                    weight: 3
+                };
+
+            },
+
+            onEachFeature: function (feature, layer) {
+
+                var popup_content =
+                    "Fungsi: " +
+                    feature.properties.NAMA_UNSUR +
+                    "<br>" +
+                    "Panjang (km): " +
+                    feature.properties.panjang_km;
+
+                layer.on({
+
+                    click: function () {
+                        layer.bindPopup(popup_content).openPopup();
+                    },
+
+                    mouseover: function () {
+                        layer.bindTooltip(
+                            feature.properties.NAMA_UNSUR,
+                            {
+                                direction: "auto",
+                                sticky: true
+                            }
+                        ).openTooltip();
+                    }
+
+                });
+
+            }
+
+        });
+
+        $.getJSON(
+            "geojson/jalan.geojson",
+            function (data) {
+
+                jalan.addData(data);
+                map.addLayer(jalan);
+
+            }
+        );
+
+
+        // GeoJSON Polygon Jumlah Penduduk
+        var jumlah_penduduk = L.geoJSON(null, {
+
+            style: function (feature) {
+
+                if (feature.properties.Penduduk <= 12000) {
+
+                    return {
+                        opacity: 1,
+                        color: "black",
+                        weight: 1,
+                        fillOpacity: 0.7,
+                        fillColor: "#ffffb2"
+                    };
+
+                }
+
+                if (
+                    feature.properties.Penduduk > 12000 &&
+                    feature.properties.Penduduk <= 24000
+                ) {
+
+                    return {
+                        opacity: 1,
+                        color: "black",
+                        weight: 1,
+                        fillOpacity: 0.7,
+                        fillColor: "#fd8d3c"
+                    };
+
+                }
+
+                if (feature.properties.Penduduk > 24000) {
+
+                    return {
+                        opacity: 1,
+                        color: "black",
+                        weight: 1,
+                        fillOpacity: 0.7,
+                        fillColor: "#bd0026"
+                    };
+
+                }
+
+            },
+
+            onEachFeature: function (feature, layer) {
+
+                var popup_content =
+                    "Kecamatan: " +
+                    feature.properties.WADMKC +
+                    "<br>" +
+                    "Jumlah Penduduk: " +
+                    feature.properties.Penduduk;
+
+                layer.on({
+
+                    click: function () {
+                        layer.bindPopup(popup_content).openPopup();
+                    },
+
+                    mouseover: function () {
+                        layer.bindTooltip(
+                            feature.properties.WADMKC,
+                            {
+                                direction: "auto",
+                                sticky: true
+                            }
+                        ).openTooltip();
+                    }
+
+                });
+
+            }
+
+        });
+
+        $.getJSON(
+            "geojson/jumlah penduduk.geojson",
+            function (data) {
+
+                jumlah_penduduk.addData(data);
+                map.addLayer(jumlah_penduduk);
+
+            }
+        );
+
+
+        // Control Layer
+        var baseMaps = {
+            "OpenStreetMap": basemap
+        };
+
+        var overlayMaps = {
+            "Toponimi": toponimi,
+            "Jalan": jalan,
+            "Jumlah Penduduk": jumlah_penduduk
+        };
+
+        var controllayer = L.control.layers(
+            baseMaps,
+            overlayMaps
+        );
+
+        controllayer.addTo(map);
+
+    </script>
+
+</body>
+
+</html>
