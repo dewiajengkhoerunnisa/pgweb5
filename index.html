@@ -17,6 +17,20 @@
             height: 100%;
             margin: 0;
         }
+
+        .popup-label {
+            font-size: 13px;
+            color: #777;
+            margin-top: 8px;
+            margin-bottom: 2px;
+        }
+
+        .popup-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 
@@ -72,14 +86,18 @@
                     "<img src='images/" +
                     feature.properties.image +
                     "' alt='' width='200'>" +
-                    "<br>" +
-                    "Nama: " +
+
+                    "<div class='popup-label'>Nama</div>" +
+                    "<div class='popup-value'>" +
                     feature.properties.TOPONIMI +
-                    "<br>" +
-                    "Koordinat: " +
+                    "</div>" +
+
+                    "<div class='popup-label'>Koordinat</div>" +
+                    "<div class='popup-value'>" +
                     feature.geometry.coordinates[1] +
                     ", " +
-                    feature.geometry.coordinates[0];
+                    feature.geometry.coordinates[0] +
+                    "</div>";
 
                 layer.on({
 
